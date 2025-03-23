@@ -1,41 +1,70 @@
-// frontend/pages/index.js
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 export default function Home() {
-  const [vegetables, setVegetables] = useState([]);
+  const [tables, setTables] = useState([]);
+  const [selectedTable, setSelectedTable] = useState(null);
+  const [columns, setColumns] = useState([]);
 
-  useEffect(() => {
-    axios.get('http://localhost:5000/api/vegetables')
-      .then(response => setVegetables(response.data))
-      .catch(error => console.error('您的获取数据失败:', error));
+  // 获取所有表名
+  useEffect(() => { 
+    axios.get('http://localhost:5000/api/tables')
+      .then(res => setTables(res.data))
+      .catch(err => console.error('获取表失败', err));
   }, []);
+
+  // 点击获取某张表的字段结构
+  const fetchColumns = (tableName) => {
+    setSelectedTable(tableName);
+    axios.get(`http://localhost:5000/api/table/${tableName}/columns`)
+      .then(res => setColumns(res.data))
+      .catch(err => console.error('获取字段失败', err));
+  };
 
   return (
     <div style={{ padding: 20 }}>
-      <h1>蔬菜推荐列表</h1>
-      <table border="1" cellPadding="10">
-        <thead>
-          <tr>
-            <th>编号</th>
-            <th>蔬菜名称</th>
-            <th>适宜气候</th>
-            <th>光照需求</th>
-            <th>生长周期 (天)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {vegetables.map((veg) => (
-            <tr key={veg.编号}>
-              <td>{veg.编号}</td>
-              <td>{veg.蔬菜名称}</td>
-              <td>{veg.适宜气候}</td>
-              <td>{veg.光照需求}</td>
-              <td>{veg.生长周期天数}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <h1>📦 数据库表结构查看</h1>
+
+      <h2>📋 表列表：</h2>
+      <ul>
+        {tables.map(table => (
+          <li key={table}>
+            <button onClick={() => fetchColumns(table)}>
+              {table}
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      {selectedTable && (
+        <div>
+          <h2>📑 表「{selectedTable}」字段结构：</h2>
+          <table border="1" cellPadding="10">
+            <thead>
+              <tr>
+                <th>字段名</th>
+                <th>类型</th>
+                <th>是否可空</th>
+                <th>键</th>
+                <th>默认值</th>
+                <th>额外信息</th>
+              </tr>
+            </thead>
+            <tbody>
+              {columns.map(col => (
+                <tr key={col.Field}>
+                  <td>{col.Field}</td>
+                  <td>{col.Type}</td>
+                  <td>{col.Null}</td>
+                  <td>{col.Key}</td>
+                  <td>{col.Default}</td>
+                  <td>{col.Extra}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
