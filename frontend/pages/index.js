@@ -8,7 +8,7 @@ export default function Home() {
   useEffect(() => {
     axios.get('http://localhost:5000/api/vegetables')
       .then(response => setVegetables(response.data))
-      .catch(error => console.error('您的获取数据失败:', error));
+      .catch(error => console.error('您tmd的获取数据失败:', error));
   }, []);
 
   return (
