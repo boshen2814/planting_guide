@@ -6,11 +6,10 @@ export default function Home() {
   const [selectedTable, setSelectedTable] = useState(null);
   const [columns, setColumns] = useState([]);
 
-  // 获取所有表名
-  useEffect(() => { 
-    axios.get('http://localhost:5000/api/tables')
-      .then(res => setTables(res.data))
-      .catch(err => console.error('获取表失败', err));
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/vegetables')
+      .then(response => setVegetables(response.data))
+      .catch(error => console.error('您的获取数据失败:', error));
   }, []);
 
   // 点击获取某张表的字段结构
